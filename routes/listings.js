@@ -2,27 +2,16 @@ const express = require("express");
 
 const {
 	getListings,
-	getPopularListings,
-	getRecentListings,
-    getListing
+    getListing,
+    postListing,
 } = require("../controllers/listingsController");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-	res
-		.status(200)
-		.json({
-			message: "available GET endpoints at /listings: /all, /popular, /recent",
-		});
-});
-
 router.get("/:id", getListing);
 
-router.get("/all", getListings);
+router.get("/", getListings);
 
-router.get("/popular", getPopularListings);
-
-router.get("/recent", getRecentListings);
+router.post("/", postListing)
 
 module.exports = router;
