@@ -20,6 +20,7 @@ const getListings = async (req, res) => {
 
     }
 
+    // find listings
     try {
         let listings;
         if (req.query.sort) {
@@ -34,24 +35,6 @@ const getListings = async (req, res) => {
 	
 };
 
-// const getPopularListings = async (req, res) => {
-// 	try {
-//         const listings = await Listing.find({}).sort({ views: -1 })
-//         res.status(200).json({ data: listings });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// };
-
-// const getRecentListings = async (req, res) => {
-// 	try {
-//         const listings = await Listing.find({}).sort({ createdAt: -1 })
-//         res.status(200).json({ data: listings });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// };
-
 const getListing = async (req, res) => {
     const {id} = req.params;
 
@@ -60,7 +43,8 @@ const getListing = async (req, res) => {
     }
 
     try {
-        const listing = await Listing.findById(id);
+        // incrementing the view count on each get request (too easy to exploit this)
+        const listing = await Listing.findByIdAndUpdate(id, { $inc: { views: 1 } });
         if (!listing) {
             return res.status(404).json({ error: "No listing found" });
         }
