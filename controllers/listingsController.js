@@ -19,14 +19,26 @@ const getListings = async (req, res) => {
         }
 
     }
+    // handle limit queries
+    let limitQuery = 20 // default to 20 results
+
+    if (req.query.limit) {
+        // make sure the query is a positive round number
+        if (parseInt(req.query.limit) > 0) {
+            limitQuery = Math.ceil(parseInt(req.query.limit))
+            console.log(limitQuery)
+        } else {
+            return res.status(400).json({ error: "Limit must be a positive number" });
+        }
+    }
 
     // find listings
     try {
         let listings;
         if (req.query.sort) {
-            listings = await Listing.find({}).sort({ [sortQuery[0]]: sortQuery[1] });
+            listings = await Listing.find({}).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
         } else {
-            listings = await Listing.find({})
+            listings = await Listing.find({}).limit(limitQuery);
         }
         res.status(200).json({ data: listings });
     } catch (err) {
