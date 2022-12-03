@@ -1,6 +1,8 @@
 # RealMarket-backend
 api endpoint for RealMarket project
 
+
+
 ## Available endpoints
 
 ### ``/listings GET`` 
@@ -10,6 +12,8 @@ api endpoint for RealMarket project
 - sort: ( \<field\>+\<sort type\> ) ``?sort=price+ascending``
 > available fields: ``price`` ``createdAt`` ``views`` <br>
 > available sort types: ``ascending`` ``descending``
+
+<hr>
 
 ### ``/listings/:id GET`` 
 > returns a single listing with matching ``:id``
@@ -22,8 +26,22 @@ api endpoint for RealMarket project
 {
   "title": "Black T-Shirt",
   "description": "Selling this size M black t-shirt",
-  "pictures": ["http://link.to/picture.jpeg", "http://another.link.to/picture.jpeg"]
+  "pictures": ["http://link.to/picture.jpeg", "http://another.link.to/picture.jpeg"],
   "price": 20,
   "location": "Bongo, Chingo Republic"
 }
 ```
+<hr>
+
+### ``/listings/:id PATCH`` 
+> update an existing listing with a matching ``:id``
+#### **request body structure:**
+```json
+{
+  "<field to update>": "<new value>"
+}
+```
+
+### ``/listings/:id DELETE`` 
+> deletes a listing with matching ``:id``
+
