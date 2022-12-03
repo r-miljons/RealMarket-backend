@@ -12,10 +12,10 @@ const getListings = async (req, res) => {
         sortQuery = req.query.sort.split(' ');
         // make sure the query includes a field and a type
         if (sortQuery.length !== 2) {
-            return res.status(404).json({ error: "Sort query must be formatted similar to the example: ?sort=price+descending" });
+            return res.status(400).json({ error: "Sort query must be formatted similar to the example: ?sort=price+descending" });
         }
         if (!availableFields.includes(sortQuery[0]) || !availableSortTypes.includes(sortQuery[1])) {
-            return res.status(404).json({ error: "Available fields for sorting are: " + availableFields.join(", ") + ". And available sorting types are: " + availableSortTypes.join(", ") + "." });
+            return res.status(400).json({ error: "Available fields for sorting are: " + availableFields.join(", ") + ". And available sorting types are: " + availableSortTypes.join(", ") + "." });
         }
 
     }
@@ -39,7 +39,7 @@ const getListing = async (req, res) => {
     const {id} = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({ error: "Invalid ID" });
+        return res.status(400).json({ error: "Invalid ID" });
     }
 
     try {
@@ -86,8 +86,42 @@ const postListing = async (req, res) => {
         const listing = await Listing.create({ title, description, price, pictures, location, views: 0 });
         res.status(200).json({ data: listing });
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 };
 
-module.exports = { getListings, getListing, postListing };
+// DELETE handler
+
+const deleteListing = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    try {
+        const listing = await Listing.findByIdAndDelete(id);
+        res.status(200).json({ data: listing });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+// PATCH handler
+
+const updateListing = async (req, res) => {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "Invalid ID" });
+    } 
+
+    try {
+        const listing = await Listing.findByIdAndUpdate(id, req.body);
+        res.status(200).json({ data: listing });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+module.exports = { getListings, getListing, postListing, deleteListing, updateListing };
