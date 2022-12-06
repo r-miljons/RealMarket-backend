@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const listingsRoutes = require("./routes/listings");
+const usersRoutes = require("./routes/users");
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // routes
 app.use("/listings", listingsRoutes);
+app.use("/users", usersRoutes);
 
 app.get("/", (req,res) => {
     res.status(200).json({ message: "Welcome to the node api, send GET to /listings for more info" })
