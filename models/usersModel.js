@@ -49,7 +49,7 @@ usersSchema.statics.signup = async function (username, password) {
 
 // login static method
 usersSchema.statics.login = async function(username, password) {
-
+    console.log(username, password);
     // validate inputs 
     if (!username || !password) {
         throw Error("All fields must be provided");

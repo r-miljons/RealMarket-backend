@@ -3,7 +3,8 @@ const express = require("express");
 const {
     getUsers,
     getUser,
-    addUser,
+    signupUser,
+    loginUser,
     updateUser,
     deleteUser
 } = require("../controllers/usersController");
@@ -14,7 +15,9 @@ router.get("/", getUsers);
 
 router.get("/:id", getUser);
 
-router.post("/", addUser);
+router.post("/signup", signupUser);
+
+router.post("/login", loginUser);
 
 router.patch("/:id", updateUser);
 
