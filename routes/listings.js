@@ -1,4 +1,5 @@
 const express = require("express");
+const requireAuth = require("../middleware/requireAuth");
 
 const {
 	getListings,
@@ -14,10 +15,10 @@ router.get("/:id", getListing);
 
 router.get("/", getListings);
 
-router.post("/", postListing);
+router.post("/", requireAuth, postListing);
 
-router.delete("/:id", deleteListing);
+router.delete("/:id", requireAuth, deleteListing);
 
-router.patch("/:id", updateListing);
+router.patch("/:id", requireAuth, updateListing);
 
 module.exports = router;

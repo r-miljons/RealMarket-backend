@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 const Listing = require("../models/listingsModel");
 
-// GET handlers
+// GET listings
+
 const getListings = async (req, res) => {
+
     // handle sort queries
     let sortQuery;
 
@@ -47,6 +49,8 @@ const getListings = async (req, res) => {
 	
 };
 
+// GET listing
+
 const getListing = async (req, res) => {
     const {id} = req.params;
 
@@ -67,7 +71,7 @@ const getListing = async (req, res) => {
     }
 }
 
-// POST handlers
+// POST listing
 
 const postListing = async (req, res) => {
     let { title, description, price, pictures, location } = req.body
@@ -102,13 +106,18 @@ const postListing = async (req, res) => {
     }
 };
 
-// DELETE handler
+// DELETE listing
 
 const deleteListing = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    // user can only delete his own listing
+    if (!req.user._id.equals(id)) {
+        return res.status(401).json({ error: "Unauthorized access" });
     }
 
     try {
@@ -119,7 +128,7 @@ const deleteListing = async (req, res) => {
     }
 };
 
-// PATCH handler
+// PATCH listing
 
 const updateListing = async (req, res) => {
     const { id } = req.params;
@@ -127,6 +136,11 @@ const updateListing = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: "Invalid ID" });
     } 
+
+    // user can only update his own listing
+    if (!req.user._id.equals(id)) {
+        return res.status(401).json({ error: "Unauthorized access" });
+    }
 
     try {
         const listing = await Listing.findByIdAndUpdate(id, req.body);

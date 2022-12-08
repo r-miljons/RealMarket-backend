@@ -1,4 +1,5 @@
 const express = require("express");
+const requireAuth = require("../middleware/requireAuth");
 
 const {
     getUsers,
@@ -19,8 +20,8 @@ router.post("/signup", signupUser);
 
 router.post("/login", loginUser);
 
-router.patch("/:id", updateUser);
+router.patch("/:id", requireAuth, updateUser);
 
-router.delete("/:id", deleteUser);
+router.delete("/:id", requireAuth, deleteUser);
 
 module.exports = router;

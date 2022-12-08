@@ -7,6 +7,8 @@ const createToken = (_id) => {
     return jwt.sign({_id}, process.env.JWT_SECRET, { expiresIn: "999 years" });
 }
 
+// GET users
+
 const getUsers = async (req, res) => {
     try {
         const users = await User.find({});
@@ -15,6 +17,8 @@ const getUsers = async (req, res) => {
         res.status(500).json({ error: err });
     }
 };
+
+// GET user
 
 const getUser = async (req, res) => {
     const { id } = req.params;
@@ -34,6 +38,8 @@ const getUser = async (req, res) => {
     }
 };
 
+// SIGNUP user
+
 const signupUser = async (req, res) => {
     const { username, password } = req.body;
 
@@ -46,6 +52,8 @@ const signupUser = async (req, res) => {
     }
 };
 
+// LOGIN user
+
 const loginUser = async (req, res) => {
     const { username, password } = req.body;
 
@@ -57,6 +65,8 @@ const loginUser = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 };
+
+// UPDATE user
 
 const updateUser = async (req, res) => {
     const { id } = req.params;
@@ -75,6 +85,11 @@ const updateUser = async (req, res) => {
         return res.status(400).json({ error: "Invalid username" });
     }
 
+    // user can only update his own profile
+    if (!req.user._id.equals(id)) {
+        return res.status(401).json({ error: "Unauthorized access" });
+    }
+
     try {
         const user = await User.findByIdAndUpdate({ _id: id }, { ...req.body });
         if (!user) {
@@ -86,11 +101,18 @@ const updateUser = async (req, res) => {
     }
 };
 
+// DELETE user
+
 const deleteUser = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    // user can only delete his own profile
+    if (!req.user._id.equals(id)) {
+        return res.status(401).json({ error: "Unauthorized access" });
     }
 
     try {
