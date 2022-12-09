@@ -23,7 +23,11 @@ const listingsSchema = new mongoose.Schema({
     views: {
         type: Number,
         required: true
-    }
+    },
+    user: {
+        type: Object,
+        required: true
+    },
 }, {
     timestamps: true,
 });

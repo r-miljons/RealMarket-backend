@@ -19,6 +19,9 @@ usersSchema.statics.signup = async function (username, password) {
     if (!username || !password) {
         throw Error("All fields must be provided");
     }
+    if (username.length > 30) {
+        throw Error("Username can't be longer than 30 characters");
+    }
     if (!validator.isAlphanumeric(username)) {
         throw Error("Username can only contain letters and numbers");
     }

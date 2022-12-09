@@ -90,6 +90,14 @@ const updateUser = async (req, res) => {
         return res.status(401).json({ error: "Unauthorized access" });
     }
 
+    // check if username is taken when updating it
+    if (req.body.username) {
+        const user = await User.findOne({ username: req.body.username });
+        if (user) {
+            return res.status(400).json({ error: "Username already taken" });
+        }
+    }
+
     try {
         const user = await User.findByIdAndUpdate({ _id: id }, { ...req.body });
         if (!user) {
