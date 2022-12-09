@@ -21,6 +21,17 @@ const getListings = async (req, res) => {
         }
 
     }
+
+    // handle user queries
+    let userQuery;
+
+    if (req.query.user) {
+        // check if id is valid
+        if (!mongoose.Types.ObjectId.isValid(req.query.user)) {
+            return res.status(400).json({ error: "Invalid ID" }); 
+        }
+        userQuery = mongoose.Types.ObjectId(req.query.user);
+    }
     // handle limit queries
     let limitQuery = 20 // default to 20 results
 
@@ -36,12 +47,18 @@ const getListings = async (req, res) => {
 
     // find listings
     try {
+        // filter listings depending on queries
         let listings;
-        if (req.query.sort) {
+        if (req.query.sort && req.query.user) {
+            listings = await Listing.find({ "user._id": userQuery }).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
+        } else if (req.query.sort) {
             listings = await Listing.find({}).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
+        } else if (req.query.user) {
+            listings = await Listing.find({ "user._id": userQuery }).limit(limitQuery);
         } else {
             listings = await Listing.find({}).limit(limitQuery);
         }
+
         res.status(200).json({ data: listings });
     } catch (err) {
         res.status(500).json({ error: err.message });
