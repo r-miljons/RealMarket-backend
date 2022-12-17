@@ -14,7 +14,7 @@ const listingsSchema = new mongoose.Schema({
         required: true
     },
     pictures: {
-        type: [String],
+        type: [Object],
     },
     location: {
         type: String,
@@ -28,6 +28,9 @@ const listingsSchema = new mongoose.Schema({
         type: Object,
         required: true
     },
+    comments: {
+        type: [Object]
+    }
 }, {
     timestamps: true,
 });
