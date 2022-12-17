@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 const commentsSchema = new mongoose.Schema(
 	{
 		text: { type: String, required: true },
-		likes: { type: Number, required: true },
-		replies: { type: [Object], required: true },
-        user: { type: Object, required: true }
+		likes: { type: [Object] },
+		replies: { type: [Object] },
+        user: { type: Object, required: true },
+        listing: { type: Object, required: true }
 	},
 	{ timestamps: true }
 );

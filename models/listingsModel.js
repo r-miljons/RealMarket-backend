@@ -27,9 +27,6 @@ const listingsSchema = new mongoose.Schema({
     user: {
         type: Object,
         required: true
-    },
-    comments: {
-        type: [Object]
     }
 }, {
     timestamps: true,
