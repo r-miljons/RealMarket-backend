@@ -7,8 +7,9 @@ api endpoint for RealMarket project
 
 ### ``/listings GET`` 
 > returns all of the listings (default limit: 20) <br>
-#### **queries:** 
+#### **queries: (all can be combined)** 
 - limit: ( positive number ) ``?limit=4``
+- user: ( id ) ``?user=639351c6ac1298585cb3b31d``
 - sort: ( \<field\>+\<sort type\> ) ``?sort=price+ascending``
 > available fields: ``price`` ``createdAt`` ``views`` <br>
 > available sort types: ``ascending`` ``descending``
