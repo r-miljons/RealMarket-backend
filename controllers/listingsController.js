@@ -39,7 +39,6 @@ const getListings = async (req, res) => {
         // make sure the query is a positive round number
         if (parseInt(req.query.limit) > 0) {
             limitQuery = Math.ceil(parseInt(req.query.limit))
-            console.log(limitQuery)
         } else {
             return res.status(400).json({ error: "Limit must be a positive number" });
         }

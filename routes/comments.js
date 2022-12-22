@@ -2,8 +2,7 @@ const express = require("express");
 const requireAuth = require("../middleware/requireAuth");
 
 const {
-	getComments,
-    getComment,
+    getComments,
     postComment,
     deleteComment,
     updateComment,
@@ -11,16 +10,12 @@ const {
 
 const router = express.Router();
 
-router.use(requireAuth);
+router.get("/:id", getComments);
 
-router.get("/:id", getComment);
+router.post("/", requireAuth, postComment);
 
-router.get("/", getComments);
+router.delete("/:id", requireAuth, deleteComment);
 
-router.post("/", postComment);
-
-router.delete("/:id", deleteComment);
-
-router.patch("/:id", updateComment);
+router.patch("/:id", requireAuth, updateComment);
 
 module.exports = router;

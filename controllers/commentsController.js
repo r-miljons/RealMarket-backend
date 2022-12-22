@@ -4,17 +4,6 @@ const mongoose = require("mongoose");
 // GET Comments
 
 const getComments = async (req, res) => {
-    try {
-        const comments = await Comment.find({});
-        res.status(200).json({ data: comments });
-    } catch (err) {
-        res.status(500).json({ error: err });
-    }
-};
-
-// GET Comment
-
-const getComment = async (req, res) => {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -22,9 +11,9 @@ const getComment = async (req, res) => {
     }
 
     try {
-        const comment = await c.findOne({_id: id});
+        const comment = await Comment.find({"listing._id": id}).sort({ createdAt: -1 });
         if (!comment) {
-            return res.status(404).json({ error: "No comment found" });
+            return res.status(404).json({ error: "No comments found" });
         }
         res.status(200).json({ data: comment });
     } catch (err) {
@@ -36,26 +25,16 @@ const getComment = async (req, res) => {
 
 const postComment = async (req, res) => {
     // get data about comment
+
     let { text, user, listing } = req.body
 
     // requested field handling
-    const emptyFields = [];
-
-    if (!text) {
-        emptyFields.push("Text");
-    }
-    if (!user) {
-        emptyFields.push("User");
-    }
-    if (!listing) {
-        emptyFields.push("Listing");
-    }
-    if (emptyFields.length > 0) {
-        return res.status(400).json({ error: "Please provide the fields: " + emptyFields.join(", ") });
+    if (text.trim() === '') {
+        return res.status(400).json({ error: "Cannot post an empty comment" });
     }
 
     try {
-        const comment = await Comment.create({ text, likes: [], replies: [], listing, user: req.user });
+        const comment = await Comment.create({ text, likes: [], replies: [], listing, user: {_id: user._id, username: user.username} });
         res.status(200).json({ data: comment });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -66,6 +45,7 @@ const postComment = async (req, res) => {
 
 const updateComment = async (req, res) => {
     const { id } = req.params;
+    const { likes, replies, text } = req.body;
 
     // check if id is valid
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -79,15 +59,16 @@ const updateComment = async (req, res) => {
             return res.status(404).json({ error: "No comment found" });
         }
 
-        // user can only update his own comment
-        if (!req.user._id.equals(comment.user._id)) {
-            return res.status(401).json({ error: "Unauthorized access" });
-        }
-
         // Handle text updates
 
         // check if text is empty string
-        if (typeof req.body.text === "string") {
+        if (typeof text === "string") {
+
+            // user can only update the text of his own comment
+            if (!req.user._id.equals(comment.user._id)) {
+                return res.status(401).json({ error: "Unauthorized access" });
+            }
+
             if (req.body.text.trim().length === 0) {
                 return res.status(400).json({ error: "Comment text cannot be empty string" });
             }
@@ -97,15 +78,19 @@ const updateComment = async (req, res) => {
         // Handle likes
 
          // if request includes a likes update, check if the user has already liked this comment, if yes, remove the like
-        if (req.body.likes) {
-            comment.likes.find(user => req.user._id.equals(user._id)) && await Comment.findByIdAndUpdate({ _id: id }, { $pull: { likes: { _id: req.user._id  } } })
-            // else add the like
-            await Comment.findByIdAndUpdate({ _id: id }, { $push: { likes: req.user } })
+        if (likes) {
+            const userLiked = await Comment.findOne({_id: id, "likes._id": req.user._id});
+
+            if (userLiked) {
+                await Comment.findByIdAndUpdate({ _id: id }, { $pull: { likes: { _id: req.user._id  } } })
+            } else {
+                await Comment.findByIdAndUpdate({ _id: id }, { $push: { likes: req.user } })
+            }
         }
 
         // Handle replies
 
-        if (req.body.replies) {
+        if (replies) {
             await Comment.findByIdAndUpdate({ _id: id }, { $push: { replies: req.body.replies } })
         }
         
@@ -147,7 +132,6 @@ const deleteComment = async (req, res) => {
 
 module.exports = {
     getComments,
-    getComment,
     postComment,
     updateComment,
     deleteComment
