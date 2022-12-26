@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/usersModel");
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 // creating a token for authentication
 const createToken = (_id) => {
@@ -11,7 +12,7 @@ const createToken = (_id) => {
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find({});
+        const users = await User.find({}).select("-password");
         res.status(200).json({ data: users });
     } catch (err) {
         res.status(500).json({ error: err });
@@ -28,7 +29,7 @@ const getUser = async (req, res) => {
     }
 
     try {
-        const user = await User.findOne({_id: id});
+        const user = await User.findOne({_id: id}).select("-password");
         if (!user) {
             return res.status(404).json({ error: "No user found" });
         }
@@ -81,7 +82,7 @@ const updateUser = async (req, res) => {
     }
 
     // if username is empty string
-    if (!req.body.username) {
+    if (req.body.username?.length === 0) {
         return res.status(400).json({ error: "Invalid username" });
     }
 
@@ -95,6 +96,18 @@ const updateUser = async (req, res) => {
         const user = await User.findOne({ username: req.body.username });
         if (user) {
             return res.status(400).json({ error: "Username already taken" });
+        }
+    }
+
+    if (req.body.email) {
+        if (!validator.isEmail(req.body.email)) {
+            return res.status(400).json({ error: "Invalid email" });
+        }
+    }
+
+    if (req.body.phone) {
+        if (!validator.isNumeric(req.body.email)) {
+            return res.status(400).json({ error: "Phone number must contain only numbers" });
         }
     }
 

@@ -34,7 +34,7 @@ const postComment = async (req, res) => {
     }
 
     try {
-        const comment = await Comment.create({ text, likes: [], replies: [], listing, user: {_id: user._id, username: user.username} });
+        const comment = await Comment.create({ text, likes: [], replies: [], listing, user: {_id: user.id, username: user.username} });
         res.status(200).json({ data: comment });
     } catch (err) {
         res.status(500).json({ error: err.message });
