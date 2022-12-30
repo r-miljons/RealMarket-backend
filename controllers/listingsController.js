@@ -5,7 +5,7 @@ const Listing = require("../models/listingsModel");
 
 const getListings = async (req, res) => {
 
-    // handle sort queries
+    // HANDLE SORT QUERIES
     let sortQuery;
 
     if (req.query.sort) {
@@ -22,7 +22,7 @@ const getListings = async (req, res) => {
 
     }
 
-    // handle user queries
+    // HANDLE USER QUERIES
     let userQuery;
 
     if (req.query.user) {
@@ -32,7 +32,7 @@ const getListings = async (req, res) => {
         }
         userQuery = mongoose.Types.ObjectId(req.query.user);
     }
-    // handle limit queries
+    // HANDLE LIMIT QUERIES
     let limitQuery = 20 // default to 20 results
 
     if (req.query.limit) {
@@ -44,16 +44,37 @@ const getListings = async (req, res) => {
         }
     }
 
-    // find listings
+    //HANDLE SEARCH QUERIES
+    let searchQuery;
+    if (req.query.search) {
+        searchQuery = new RegExp(decodeURIComponent(req.query.search), "i")
+    }
+
+    // FIND LISTINGS
     try {
         // filter listings depending on queries
         let listings;
-        if (req.query.sort && req.query.user) {
+
+        if (req.query.sort && req.query.user && req.query.search) {
+            listings = await Listing.find({ "user._id": userQuery, title: searchQuery }).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
+        
+        } else if (req.query.sort && req.query.user) {
             listings = await Listing.find({ "user._id": userQuery }).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
+        
         } else if (req.query.sort) {
-            listings = await Listing.find({}).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
+            if (req.query.search) {
+                listings = await Listing.find({ title: searchQuery }).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
+            } else {
+                listings = await Listing.find({}).sort({ [sortQuery[0]]: sortQuery[1] }).limit(limitQuery);
+            }
+        
         } else if (req.query.user) {
-            listings = await Listing.find({ "user._id": userQuery }).limit(limitQuery);
+            if (req.query.search) { 
+                listings = await Listing.find({ "user._id": userQuery, title: searchQuery }).limit(limitQuery);
+            } else {
+                listings = await Listing.find({ "user._id": userQuery }).limit(limitQuery);
+            }
+            
         } else {
             listings = await Listing.find({}).limit(limitQuery);
         }

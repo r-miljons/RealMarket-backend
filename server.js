@@ -19,7 +19,7 @@ app.use("/users", usersRoutes);
 app.use("/comments", commentsRoutes);
 
 app.get("/", (req,res) => {
-    res.status(200).json({ message: "Welcome to the node api, send GET to /listings for more info" })
+    res.status(200).json({ message: "Welcome to the node api, available endpoints: /listings, /users, /comments" })
 })
 
 // connect to db
