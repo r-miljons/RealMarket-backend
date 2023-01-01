@@ -11,8 +11,20 @@ const createToken = (_id) => {
 // GET users
 
 const getUsers = async (req, res) => {
+
+    //Handle Sort Queries
+    let searchQuery;
+    if (req.query.search) {
+        searchQuery = new RegExp(decodeURIComponent(req.query.search), "i")
+    }
+
     try {
-        const users = await User.find({}).select("-password");
+        let users;
+        if (req.query.search) {
+            users = await User.find({ username: searchQuery }).select("-password");
+        } else {
+            users = await User.find({}).select("-password");
+        }
         res.status(200).json({ data: users });
     } catch (err) {
         res.status(500).json({ error: err });
